@@ -42,11 +42,7 @@ class CPICalculator:
             category_id,
             parent,
             weight,
-            NOT EXISTS (
-                SELECT 1 
-                FROM categories c2 
-                WHERE c2.parent = categories.category_id
-            ) AS is_leaf
+            hierarchy AS is_leaf
         FROM categories
         """
         result = self._execute_clickhouse_query(query)
@@ -60,9 +56,14 @@ class CPICalculator:
         print("前5行数据:\n", df.head())
 
         # 筛选叶子节点（is_leaf=1）
-        self.leaf_categories = df[df['is_leaf'] == 1][['category_id', 'weight']]
+
+        print("叶子节点数：", df[df['is_leaf'] == 3].shape[0])
+        print("所有节点数：", df.shape[0])
+
+        self.leaf_categories = df[df['is_leaf'] == 3][['category_id', 'weight']]
 
         # 验证权重和是否为1（可选）
+
         total_weight = self.leaf_categories['weight'].sum()
         if not np.isclose(total_weight, 1.0, atol=1e-3):
             print(f"警告：叶子节点权重和为 {total_weight:.4f}")
@@ -138,11 +139,13 @@ class CPICalculator:
             )
             cpi_series[current_date] = (final_data['price_index'] * final_data['weight']).sum().round(4)
 
+        cpi_series.to_csv('f_daily_cpi.csv', header=True)
         return cpi_series
 
 
 def plot_cpi_trend(cpi_series: pd.Series):
     """绘制CPI趋势图"""
+    cpi_series.to_csv('f_daily_cpi.csv', header=True)
     plt.figure(figsize=(15, 6))
     cpi_series.plot(
         kind='line',

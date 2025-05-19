@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-data_path = Path(__file__).resolve().parent.parent / 'data' / 'data_test'
+data_path = Path(__file__).resolve().parent.parent.parent / 'data' / 'data'
 filelist = ['products.csv']  # 需要上传的文件列表
 for file in filelist:
     src_path = os.path.join(data_path, file)
