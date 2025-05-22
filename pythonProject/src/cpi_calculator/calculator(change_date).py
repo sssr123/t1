@@ -168,7 +168,11 @@ class CPICalculator:
             previous_date = current_date
 
         cpi_series.to_csv('c_daily_cpi.csv', header=True)
-        return cpi_series
+        cumulative_cpi = cpi_series.copy()
+        cumulative_cpi = cumulative_cpi.dropna().cumprod()
+
+        cumulative_cpi.to_csv('cpi_cumulative.csv')
+        return cumulative_cpi
 
 
 def plot_cpi_trend(cpi_series: pd.Series):
